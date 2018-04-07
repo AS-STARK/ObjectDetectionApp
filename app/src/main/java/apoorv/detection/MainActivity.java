@@ -11,22 +11,22 @@ import android.widget.Button;
 public class MainActivity extends AppCompatActivity {
 
     private int imgClick = 1;
+    private Button imgClickBtn;
+    private Button pickerBtn;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button imgClickBtn = (Button)findViewById(R.id.imgButton);
-        Button pickerBtn = (Button)findViewById(R.id.pickerButton);
-
+        imgClickBtn = (Button)findViewById(R.id.imgButton);
         imgClickBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if(i.resolveActivity(getPackageManager()) != null)
-                startActivityForResult(i, imgClick);
+                takePicture();
             }
         });
+        pickerBtn = (Button)findViewById(R.id.pickerButton);
         pickerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -43,6 +43,13 @@ public class MainActivity extends AppCompatActivity {
         {
             Log.d("TAG", "Image captured");
         }
+    }
+
+    protected void takePicture()
+    {
+        Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if(i.resolveActivity(getPackageManager()) != null)
+            startActivityForResult(i, imgClick);
     }
 
 }
