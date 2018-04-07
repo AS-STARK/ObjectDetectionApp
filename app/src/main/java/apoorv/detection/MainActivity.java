@@ -51,5 +51,4 @@ public class MainActivity extends AppCompatActivity {
         if(i.resolveActivity(getPackageManager()) != null)
             startActivityForResult(i, imgClick);
     }
-
 }
