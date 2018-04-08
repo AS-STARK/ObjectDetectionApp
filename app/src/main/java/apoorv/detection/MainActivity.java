@@ -1,6 +1,7 @@
 package apoorv.detection;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -12,14 +13,17 @@ import android.view.View;
 import android.widget.Button;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+
+import static android.R.attr.data;
 
 public class MainActivity extends AppCompatActivity {
 
     private int imgClick = 1;
     private Button imgClickBtn;
     private Button pickerBtn;
-    private String picCurrPath;
+    protected String picCurrPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,35 +50,43 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == imgClick && resultCode == RESULT_OK) {
-            File photoFile = null;
-            try {
-                photoFile = createImgFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.d("Errorrrr", "File not created");
-            }
-            // Continue only if the File was successfully created
-            if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this, "com.example.android.fileprovider", photoFile);
-                data.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                Log.d("TAG", "Image captured");
-            }
+
+            Intent sec = new Intent(MainActivity.this, UploadActivity.class);
+            //Log.d("TAGGG", data.getExtras().get("picPath").toString());
+            sec.putExtra("filePath", picCurrPath);
+            startActivity(sec);
+
         }
     }
 
-    protected void takePicture()
-    {
-        Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if(i.resolveActivity(getPackageManager()) != null)
-            startActivityForResult(i, imgClick);
+    protected void takePicture() {
+        File photoFile = null;
+        try {
+            photoFile = createImgFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d("Errorrrr", "File not created");
+        }
+        // Continue only if the File was successfully created
+        if (photoFile != null) {
+            Uri photoURI = FileProvider.getUriForFile(this, "com.example.android.fileprovider", photoFile);
+            Log.d("TAG", picCurrPath);
+
+            Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            i.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+            i.putExtra("picPath", picCurrPath);
+            if (i.resolveActivity(getPackageManager()) != null)
+                startActivityForResult(i, imgClick);
+        }
     }
 
     private File createImgFile()throws IOException
     {
+        FileOutputStream fileOutput;
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File imgFileName = File.createTempFile("JPEG_", ".jpg", storageDir);
-
-        picCurrPath = imgFileName.getAbsolutePath();
-        return imgFileName;
+        File photo = new File(storageDir, "something.jpg");
+        picCurrPath = photo.getAbsolutePath();
+        Log.d("picCurrPath", picCurrPath);
+        return photo;
     }
 }
